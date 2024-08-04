@@ -1,5 +1,6 @@
 # TimetableAndPlans
 ver 1.0.0 (2024/08/05更新) 
+
 GmailとGoogle Classroomから大学の予定、時間割を入手し、表示するアプリケーションです。
 ## 実装済みの機能
 ### 予定
