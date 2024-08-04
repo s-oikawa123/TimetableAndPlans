@@ -15,6 +15,10 @@ public class Application : MonoBehaviour
     [SerializeField] private GameObject planWindow;
     [SerializeField] private GameObject timetableWindow;
     [SerializeField] private ButtonManager[] buttonManagers;
+    [SerializeField] private KeywordAdder keywordAdder;
+    [SerializeField] private PlanDisplayer importantPlanDisplayer;
+    [SerializeField] private PlanDisplayer planDisplayer;
+    [SerializeField] private TimeTableDisplayer timeTableDisplayer;
     private enum DisplayState
     {
         none,
@@ -25,9 +29,9 @@ public class Application : MonoBehaviour
 
     public void Start()
     {
+        lastCheckedDate = DateTime.Now.AddMonths(-1);
         UpdatePlans();
         UpdateTimetable();
-        FilterImportantPlans();
         Display();
     }
 
@@ -45,6 +49,7 @@ public class Application : MonoBehaviour
         }
         FilterImportantPlans();
         DisplayPlans();
+        DisplayImportantPlans();
     }
 
     public void UpdateTimetable()
@@ -62,7 +67,6 @@ public class Application : MonoBehaviour
                 if (i != index)
                 {
                     buttonManagers[i].ResetButton();
-                    Debug.Log(i);
                 }
             }
 
@@ -77,9 +81,10 @@ public class Application : MonoBehaviour
         if (!importantKeywords.Contains(keyword))
         {
             importantKeywords.Add(keyword);
+            keywordAdder.UpdateKeywordDisplay(importantKeywords);
+            FilterImportantPlans();
+            DisplayImportantPlans();
         }
-        FilterImportantPlans();
-        DisplayImportantPlans();
     }
 
     public void RemoveImportantKeyword(string keyword)
@@ -87,9 +92,10 @@ public class Application : MonoBehaviour
         if (importantKeywords.Contains(keyword))
         {
             importantKeywords.Remove(keyword);
+            keywordAdder.UpdateKeywordDisplay(importantKeywords);
+            FilterImportantPlans();
+            DisplayImportantPlans();
         }
-        FilterImportantPlans();
-        DisplayImportantPlans();
     }
 
     private void FilterImportantPlans()
@@ -105,25 +111,28 @@ public class Application : MonoBehaviour
         {
             case DisplayState.plan:
                 DisplayPlans();
+                DisplayImportantPlans();
+                planWindow.SetActive(true);
                 break;
             case DisplayState.timetable:
                 DisplayTimetable();
+                timetableWindow.SetActive(true);
                 break;
         }
     }
 
     private void DisplayPlans()
     {
-        planWindow.SetActive(true);
+        planDisplayer.UpdateKeywordDisplay(plans);
     }
 
     private void DisplayTimetable()
     {
-        timetableWindow.SetActive(true);
+        timeTableDisplayer.UpdateKeywordDisplay(timetable.Classes);
     }
 
     private void DisplayImportantPlans()
     {
-        // Logic to display important plans
+        importantPlanDisplayer.UpdateKeywordDisplay(importantPlans);
     }
 }

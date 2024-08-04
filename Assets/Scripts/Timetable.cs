@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class Timetable
 {
     public List<Class> Classes { get; set; } = new List<Class>();

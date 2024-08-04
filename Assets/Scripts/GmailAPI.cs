@@ -46,7 +46,7 @@ public class GmailAPI
         UsersResource.MessagesResource.ListRequest request = service.Users.Messages.List(userId);
         request.LabelIds = "INBOX";
         request.IncludeSpamTrash = false;
-        request.MaxResults = 10;
+        request.MaxResults = 1000;
         request.Q = $"from:nihon-u.ac.jp after:{lastCheckedDate:yyyy/MM/dd}";
 
         IList<Message> messages = request.Execute().Messages;
@@ -68,20 +68,20 @@ public class GmailAPI
                 var dateHeader = message.Payload.Headers.FirstOrDefault(header => header.Name == "Date");
                 string date = dateHeader != null ? dateHeader.Value : "Unknown";
                 DateTime parsedDate;
-                if (DateTime.TryParseExact(date, "ddd, dd MMM yyyy HH:mm:ss K", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
-                {
-                    Console.WriteLine($"  Date: {parsedDate}");
-                }
+                DateTime.TryParseExact(date, "ddd, dd MMM yyyy HH:mm:ss K", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate);
 
                 var match = emailRegex.Match(from);
                 string emailAddress = match.Success ? match.Value : "Unknown";
+
+                var nameMatch = Regex.Match(from, @"^(.*?)(?=\s*<)");
+                string name = nameMatch.Success ? nameMatch.Value.Trim() : from;
 
                 var subjectHeader = message.Payload.Headers.FirstOrDefault(header => header.Name == "Subject");
                 string subject = subjectHeader != null ? subjectHeader.Value : "No Subject";
 
                 if (match.Success)
                 {
-                    result.Add(new Plan(message.Id, subject, emailBody, parsedDate));
+                    result.Add(new Plan(message.Id, name, subject, emailBody, parsedDate));
                 }
             }
         }
